@@ -1,0 +1,85 @@
+<!-- Logback configuration. See http://logback.qos.ch/manual/index.html -->
+<!-- 级别包括：TRACE、DEBUG、INFO、WARN和ERROR，定义于ch.qos.logback.classic.Level类。
+程序会打印高于或等于所设置级别的日志，设置的日志等级越高，打印出来的日志就越少。
+如果设置级别为INFO，则优先级高于等于INFO级别（如：INFO、 WARN、ERROR）的日志信息将可以被输出,小于该级别的如DEBUG将不会被输出
+为确保所有logger都能够最终继承一个级别，根logger总是有级别，默认情况下，这个级别是DEBUG。-->
+
+<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度  %msg表示日志消息，%n表示换行符-->
+
+<configuration scan="true" scanPeriod="10 seconds">
+
+    <property name="LOG_PATH" value="/app/springboot-executor-kafka"/>
+    <!--输出模式 info file-->
+    <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <!--被写入的文件名，可以是相对目录，也可以是绝对目录，如果上级目录不存在会自动创建，没有默认值。-->
+        <File>${LOG_PATH}/info.log</File>
+        <!--滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/info-%d{yyyyMMdd}.%i.log</fileNamePattern>
+            <!--设置每个文件大小，最大历史，最大文件大小
+                <maxFileSize>20KB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>20GB</totalSizeCap>
+            -->
+            <!--滚动策略-->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!--这是活动文件的大小，默认值是10MB。-->
+                <maxFileSize>5GB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+            <!--可选节点，控制保留的归档文件的最大数量，超出数量就删除旧文件。
+                假设设置每个月滚动，且<maxHistory>是6，则只保存最近6天的文件，删除之前的旧文件。
+                注意，删除旧文件是，那些为了归档而创建的目录也会被删除。-->
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--比较日志记录请求的Level值和ThresholdFilter中配置的Level值，
+            当日志记录请求的Level值小于ThresholdFilter中配置的Level值，
+            日志记录请求被判定为无效。-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <File>${LOG_PATH}/error.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/error-%d{yyyyMMdd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>5GB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <!--用来设置某一个包或具体的某一个类的日志打印级别、以及指定<appender>。
+        <loger>仅有一个name属性，一个可选的level和一个可选的addtivity属性。-->
+
+    <!--myibatis log configure-->
+    <logger name="com.ibatis" level="DEBUG"/>
+    <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="DEBUG"/>
+    <logger name="com.ibatis.common.jdbc.ScriptRunner" level="DEBUG"/>
+    <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="DEBUG"/>
+    <logger name="java.sql.Connection" level="DEBUG"/>
+    <logger name="java.sql.Statement" level="DEBUG"/>
+    <logger name="java.sql.PreparedStatement" level="DEBUG"/>
+    <logger name="out" additivity="false">
+        <appender-ref ref="OUT_FILE"/>
+    </logger>
+
+    <logger name="info">
+        <appender-ref ref="INFO_FILE"/>
+    </logger>
+    <logger name="error">
+        <appender-ref ref="ERROR_FILE"/>
+    </logger>
+
+
+</configuration>

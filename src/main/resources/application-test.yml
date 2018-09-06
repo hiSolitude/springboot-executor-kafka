@@ -1,0 +1,19 @@
+spring:
+  kafka:
+    consumer:
+#groupId
+      group-id: springbootKafkaId
+#key-value序列化反序列化
+      key-deserializer: org.apache.kafka.common.serialization.StringSerializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: true
+      bootstrap-servers: 192.168.233.141:9092,192.168.233.142:9092,192.168.233.143:9092
+      auto-offset-reset: latest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      batch-size: 65536
+      buffer-memory: 524288
+      acks: all
+    listener:
+      concurrency: 3
